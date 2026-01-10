@@ -1,3 +1,9 @@
+# *************************************************************************** #
+# Copyright 2025 Roy Stewart. All rights reserved.                            #
+# Released under the GPL3 license.                                            #
+# License URL: https://www.gnu.org/licenses/gpl-3.0.en.html#license-text      #
+# *************************************************************************** #
+
 import os
 from pathlib import Path
 import shutil
