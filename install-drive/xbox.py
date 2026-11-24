@@ -3,32 +3,18 @@ from pathlib import Path
 import shutil
 from urllib.request import urlretrieve
 from zipfile import ZipFile
+from _utils import select_drive, download_temp_file
 
 file_url = 'https://www.xbox.com/xboxone/osu1'
 
 def main():
-    drive_mount_path = select_installation_drive()
+    drive_mount_path = select_drive("NTFS")
     prepare_drive(drive_mount_path)
-    downloaded_file_path = download_update_file()
+    downloaded_file_path = download_temp_file(file_url, "OSU1.zip")
     extract_contents(downloaded_file_path, drive_mount_path)
 
-def select_installation_drive():
-    print('Make sure that the target drive is formatted as NTFS and mounted.')
-    input('Once the target drive is properly formatted and mounted press ENTER.')
-    while (True):
-        selected_path = Path(input('Enter the target drive\'s mount point: '))
-        if not selected_path.exists():
-            print('The selected path does not exist.')
-            continue
-        if not selected_path.is_dir():
-            print('The selected path is not directory.')
-            continue
-        if not selected_path.is_mount():
-            print('The selected path is not a mount point. You must select the root directory of the drive.')
-            continue
-        return selected_path
-
 def prepare_drive(mount_path):
+    input('If you choose to proceed, all data on the selected drive will be deleted. Do you wish to continue?')
     print('Emptying drive contents...')
     for item in os.listdir(mount_path):
         file_path = os.path.join(mount_path, item)
@@ -41,15 +27,7 @@ def prepare_drive(mount_path):
             print('Failed to delete %s. Reason: %s' % (file_path, e))
     print('Drive successfully emptied.')
 
-def download_update_file():
-    # TODO: check if the file is downloaded and offer to use the current file if so
-    print('Downloading OSU.zip file...')
-    downloaded_file, http_message = urlretrieve(file_url)
-    print(f'Downloaded file is saved at {downloaded_file}.')
-    # TODO: add fallback file hosts in case microsoft changes the url or stops hosting
-    return downloaded_file
-
-def extract_contents(source, destination):
+def extract_contents(source: Path, destination: Path):
     print('Extracting update contents...')
     with ZipFile(source) as zip_file:
         zip_file.extractall(destination)
